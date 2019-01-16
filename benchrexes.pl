@@ -9,6 +9,35 @@ use Getopt::Long;							#looooong arguments
 use Time::HiRes;							#used for benchmarking NFA's
 use Time::Out;								#D #but don't let it get too out of hand
 
+=head1 NAME
+
+BenchRexes - A Regular Expression Benchmarking tool
+
+=head1 SYNOPSIS
+
+benchrexes.pl regex.txt [options]
+
+  --help     Prints this dialog
+  --timeout  How long to try an expression before giving up. Default = 25
+  --csv      Comma-separated value output of results
+  --qlimit   Upper limit cap on regex quantifiers. Default = 50
+             Larger number == more agressive
+  --lexes    Print NFA RE:DoS expression-to-string creation data
+  --debug    Print DETAILED debugging info for the string creation engine
+
+=head1 DESCRIPTION
+
+Analyze a list of regular expressions for performance;
+metrics are measured on time taken and memory usage
+
+=head1 EXAMPLES
+
+benchrexes.pl emerging_pcres.txt --timeout 4 --csv output.csv
+benchrexes.pl bad_expressions.txt --timeout 50 --csv output.csv
+benchrexes.pl malformed_expressions.txt --lexes --debug
+
+=cut
+
 #DFA related vars
 my $filename = $ARGV[0];					#Filename is meant to be the first argument
 my $regex;									#Expressions find themselves here
@@ -1176,34 +1205,5 @@ sub pcre_nonviolent {
 
 	return $pcre;					
 }
-
-=head1 NAME
-
-BenchRexes - A Regular Expression Benchmarking tool
-
-=head1 SYNOPSIS
-
-benchrexes.pl regex.txt [options]
-
-  --help     Prints this dialog
-  --timeout  How long to try an expression before giving up. Default = 25
-  --csv      Comma-separated value output of results
-  --qlimit   Upper limit cap on regex quantifiers. Default = 50
-             Larger number == more agressive
-  --lexes    Print NFA RE:DoS expression-to-string creation data
-  --debug    Print DETAILED debugging info for the string creation engine
-
-=head1 DESCRIPTION
-
-Analyze a list of regular expressions for performance;
-metrics are measured on time taken and memory usage
-
-=head1 EXAMPLES
-
-benchrexes.pl emerging_pcres.txt --timeout 4 --csv output.csv
-benchrexes.pl bad_expressions.txt --timeout 50 --csv output.csv
-benchrexes.pl malformed_expressions.txt --lexes --debug
-
-=cut
 
 # vim:ts=4:
