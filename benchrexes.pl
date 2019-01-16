@@ -1,4 +1,6 @@
+#!/usr/bin/perl
 #Regular Expression Benchmarker; both NFA (time) and DFA (memory) metrics
+
 use warnings;
 use strict;
 use Try::Tiny;								#D #to capture runwaway garbage
@@ -51,7 +53,9 @@ GetOptions('debug' => \$debug,
 		'help' => \$help);
 
 if ($help) {
-	help();
+	use Pod::Usage "pod2usage";
+	pod2usage({-verbose=>2, -exitval=>0, -output=>\*STDOUT});
+	exit;
 }
 
 if ($strings eq 0) {
@@ -629,16 +633,16 @@ sub lastlexeme ($) {
 
 	#{0,}  \{0.+
 	if ($expression =~ /{0.+$/) {						#If last characters are {0,#}
-		if ($expression =~ /(\\?[^}?+*)\]\$]{0.+)$/){	#is last character an atom
+		if ($expression =~ /(\\?[^}?+*)\]\$]\{0.+)$/){	#is last character an atom
 			$expression =~ s/\Q$1\E$//;
 		}
-		if ($expression =~ /\]{0.+$/){					#is last character is a ]
+		if ($expression =~ /\]\{0.+$/){					#is last character is a ]
 			if ($expression =~ /(\[[^\[]+{0.+)$/) {		#parse the character class
 				$expression =~ s/\Q$1\E$//;		
 			}						
 		}
-		if ($expression =~ /\){0.+$/){					#is last character is a )
-			if ($expression =~ /(\([^\(]+{0.+)$/) {		#parse the grouping
+		if ($expression =~ /\)\{0.+$/){					#is last character is a )
+			if ($expression =~ /(\([^\(]+\{0.+)$/) {	#parse the grouping
 				$expression =~ s/\Q$1\E$//;		
 			}						
 		}
@@ -1173,23 +1177,33 @@ sub pcre_nonviolent {
 	return $pcre;					
 }
 
-sub help {
-	print "NAME\n";
-	print "\tBenchRexes - A Regular Expression Benchmarking tool\n\n";
-	print "SYNOPSIS\n";
-	print "\tbenchrexes.pl regex.txt [options]\n\n";
-	print "DESCRIPTION\n";
-	print "\tThis script will analyze a list of regular expressions for performance; metrics are measured on time taken and memory usage\n\n";
-	print "OPTIONS\n";
-	print "\t--help: Prints this dialog\n";
-	print "\t--timeout: How long to try an expression before giving up. Default is 25.\n";
-	print "\t--csv: csv output of results\n";
-	print "\t--qlimit: upper limit cap on regex quantifiers. Default is 50. Larger number == more agressive\n";
-	print "\t--lexes: prints some behind the scenes on NFA RE:DoS expression-to-string creation (to sdtout)\n";
-	print "\t--debug: prints DETAILED debugging info for the string creation engine\n";
-	print "EXAMPLES\n";
-	print "\tbenchrexes.pl emerging_pcres.txt --timeout 4 --csv output.csv\n";
-	print "\tbenchrexes.pl bad_expressions.txt --timeout 50 --csv output.csv\n";
-	print "\tbenchrexes.pl malformed_expressions.txt --lexes --debug\n";
-	exit;
-}
+=head1 NAME
+
+BenchRexes - A Regular Expression Benchmarking tool
+
+=head1 SYNOPSIS
+
+benchrexes.pl regex.txt [options]
+
+  --help     Prints this dialog
+  --timeout  How long to try an expression before giving up. Default = 25
+  --csv      Comma-separated value output of results
+  --qlimit   Upper limit cap on regex quantifiers. Default = 50
+             Larger number == more agressive
+  --lexes    Print NFA RE:DoS expression-to-string creation data
+  --debug    Print DETAILED debugging info for the string creation engine
+
+=head1 DESCRIPTION
+
+Analyze a list of regular expressions for performance;
+metrics are measured on time taken and memory usage
+
+=head1 EXAMPLES
+
+benchrexes.pl emerging_pcres.txt --timeout 4 --csv output.csv
+benchrexes.pl bad_expressions.txt --timeout 50 --csv output.csv
+benchrexes.pl malformed_expressions.txt --lexes --debug
+
+=cut
+
+# vim:ts=4:
